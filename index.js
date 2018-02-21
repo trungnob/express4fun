@@ -14,9 +14,26 @@ app.use(function (req, res, next) {
 app.use(log)
 app.get('/',function(req,res){
     //res.write('Hello World')
-    res.sendFile(path.join(__dirname + '/sample_file.log'))
-    console.log(path.join(__dirname + '/simplegraph.html'))
+    var foo
+    //res.sendFile(path.join(__dirname + '/sample_file.log'))
+    var SSH = require('simple-ssh');
+    console.log(req)
+    var ssh = new SSH({
+    host: 'ni-n3xx-311fe01',
+    user: 'root',
+    pass: ''
+    });
+    ssh.exec('cat /sys/kernel/debug/rfnoc_crossbars/crossbar0/stats', {
+    out: function(stdout) {
+
+        res.write(stdout);
+        res.end();
+    }
+}).start();
 })
+
+
+
 app.listen(port,function(err,resp){
     if (err){
         console.log(`Server errror`)

@@ -9,6 +9,7 @@
   "author": "trung tran",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "simple-ssh": "^1.0.0"
   }
 }
