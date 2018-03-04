@@ -1,4 +1,9 @@
 var app = angular.module("graph_app", []);
+var DEBUG = true;
+var NATIVE_RS = "xbar"
+var LOCALFILE_RS = "sample_file.log"
+var request_string = DEBUG? LOCALFILE_RS: NATIVE_RS
+
 app.controller("graph_ctrl", function ($scope) {
     console.log("What's up")
     // create an array with nodes
@@ -55,9 +60,11 @@ app.controller("xbar_graph_ctrl", function ($http, $scope) {
         14: "duc2",
         15: "duc3"
     }
+
+    
     var nodes = null
     var edges = null
-    $http.get('xbar').then(function (response) {
+    $http.get(request_string).then(function (response) {
             var xbar_stat = response.data;
             var xbar_stat_split = xbar_stat.split(/\n/)
             var output = [];
@@ -75,7 +82,7 @@ app.controller("xbar_graph_ctrl", function ($http, $scope) {
                 noc_id_count = parseInt(first_row[i])
                 var node = {}
                 node.id = i;
-                node.label = rfnoc_name_map[noc_id_count] //noc_id_count.toString()//rfnoc_name_map[noc_id_count]
+                node.label =DEBUG? noc_id_count.toString() : rfnoc_name_map[noc_id_count] //noc_id_count.toString()//rfnoc_name_map[noc_id_count]
                 node.shape = 'square'
                 data_set.push(node)
 
@@ -122,7 +129,18 @@ app.controller("xbar_graph_ctrl", function ($http, $scope) {
                 nodes: nodes,
                 edges: edges
             };
-            var options = {};
+        var options = {
+            physics: {
+                enabled: true,
+                solver: 'barnesHut'
+            },
+            layout: {
+                hierarchical: {
+                    direction: "DU",
+                    sortMethod: "hubsize"
+                }
+            }
+        };
             var network = new vis.Network(container, data, options);
             //document.getElementById("raw_read_xbar_from_file").innerHTML = outputText;
             // document.getElementById("lines_break").innerHTML = rfnoc_name_map[0];
@@ -132,7 +150,7 @@ app.controller("xbar_graph_ctrl", function ($http, $scope) {
     })
     setInterval(function(){
         if (nodes != null)
-             $http.get('xbar').then(function (response) {
+            $http.get(request_string).then(function (response) {
                 var xbar_stat = response.data;
                 var xbar_stat_split = xbar_stat.split(/\n/)
                 var output = [];
